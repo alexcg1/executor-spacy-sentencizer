@@ -1,4 +1,5 @@
 manifest_version: 1
 name: SpacySentencizer
 description: "Sentencize Document text into chunks using spaCy Sentencizer"
+url: https://github.com/alexcg1/executor-spacy-sentencizer
 keywords: [text, spacy, sentencizer, nlp]
