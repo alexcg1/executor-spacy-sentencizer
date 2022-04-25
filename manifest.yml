@@ -1,0 +1,4 @@
+manifest_version: 1
+name: SpacySentencizer
+description: "Sentencize Document text into chunks using spaCy Sentencizer"
+keywords: [text, spacy, sentencizer, nlp]

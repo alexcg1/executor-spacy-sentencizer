@@ -1,0 +1,4 @@
+jtype: SpacySentencizer
+metas:
+  py_modules:
+    - executor.py
