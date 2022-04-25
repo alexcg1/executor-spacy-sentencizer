@@ -9,7 +9,7 @@ nlp.add_pipe("sentencizer")
 
 class SpacySentencizer(Executor):
     @requests(on="/index")
-    def sentencize(self, docs: DocumentArray, **kwargs):
+    def segment(self, docs: DocumentArray, **kwargs):
         sentencizer = Sentencizer()
         nlp = English()
         nlp.add_pipe("sentencizer")
