@@ -1,5 +1,6 @@
 from jina import Executor, DocumentArray, requests, Document
 from spacy.lang.en import English
+import re
 
 nlp = English()
 nlp.add_pipe("sentencizer")
@@ -16,17 +17,19 @@ class SpacySentencizer(Executor):
         # First do some cleanup of unwanted linebreaks
         substitutions = [
             # Convert deliberate paragraph breaks into sentence-ends so they dont get caught by next entry in the list
-            {"old": "\n\n", "new": ". "},
-            {"old": "\r\r", "new": ". "},
+            {"old": "\n\n.*", "new": ". "},
+            {"old": "\r\r.*", "new": ". "},
             # Remove incidental linebreaks caused by conversion
             {"old": "\n", "new": " "},
             {"old": "\r", "new": " "},
+            {"old": "\\s+", "new": " "}, # collapse white-spaces into one space
         ]
 
         for doc in docs:
             if doc.text:
                 for sub in substitutions:
-                    doc.text = doc.text.replace(sub["old"], sub["new"])
+                    # doc.text = doc.text.replace(sub["old"], sub["new"])
+                    doc.text = re.sub(sub["old"], sub["new"], doc.text)
 
                 # Sentencize
                 text = nlp(doc.text)
