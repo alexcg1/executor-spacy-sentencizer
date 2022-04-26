@@ -1,7 +1,7 @@
 from jina import Executor
 from docarray import Document, DocumentArray
 
-with open("Rabbit - Wikipedia - from chrome.txt") as file:
+with open("./data/rabbit.txt") as file:
     doc = Document(text=file.read())
 
 docs = DocumentArray([doc])
