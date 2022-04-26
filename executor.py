@@ -10,6 +10,7 @@ nlp.add_pipe("sentencizer")
 class SpacySentencizer(Executor):
     @requests(on="/index")
     def segment(self, docs: DocumentArray, **kwargs):
+        min_length = 20 # minimum sentence length
         sentencizer = Sentencizer()
         nlp = English()
         nlp.add_pipe("sentencizer")
@@ -20,7 +21,8 @@ class SpacySentencizer(Executor):
                 text = nlp(doc.text)
 
                 for sent in text.sents:
-                    sentences.append(Document(text=str(sent)))
+                    if len(str(sent)) >= min_length:
+                        sentences.append(Document(text=str(sent)))
 
             doc.chunks.extend(sentences)
 
