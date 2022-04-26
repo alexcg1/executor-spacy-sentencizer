@@ -6,9 +6,12 @@ nlp.add_pipe("sentencizer")
 
 
 class SpacySentencizer(Executor):
+    """
+    Splits text at doc-level into sentences using spaCy's sentencizer and stores as doc.chunks.
+    """
     @requests(on="/index")
     def segment(self, docs: DocumentArray, **kwargs):
-        min_length = 20  # minimum sentence length
+        min_sent_len = 20  # minimum sentence length
 
         # First do some cleanup of unwanted linebreaks
         substitutions = [
@@ -29,5 +32,5 @@ class SpacySentencizer(Executor):
                 text = nlp(doc.text)
 
                 for sent in text.sents:
-                    if len(str(sent)) >= min_length:
+                    if len(str(sent)) >= min_sent_len:
                         doc.chunks.append(Document(text=str(sent)))
