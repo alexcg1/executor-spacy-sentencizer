@@ -1,4 +1,5 @@
 from jina import Executor, requests
+from typing import Any, Dict, Optional, Sequence
 from docarray import Document, DocumentArray
 from spacy.lang.en import English
 import re
@@ -17,7 +18,8 @@ class SpacySentencizer(Executor):
         self.nlp.add_pipe("sentencizer")
 
     @requests(on="/index")
-    def segment(self, docs: DocumentArray, **kwargs):
+    def segment(self, docs: DocumentArray, parameters: Dict[str, Any], **kwargs):
+        traversal_paths = parameters.get("traversal_paths", self.traversal_paths)
         # First do some cleanup of unwanted linebreaks
         substitutions = [
             # Convert deliberate paragraph breaks into sentence-ends so they dont get caught by next entry in the list
@@ -29,7 +31,7 @@ class SpacySentencizer(Executor):
             {"old": "\\s+", "new": " "},  # collapse white-spaces into one space
         ]
 
-        for doc in docs[self.traversal_paths]:
+        for doc in docs[traversal_paths]:
             if doc.text:
                 for sub in substitutions:
                     doc.text = re.sub(sub["old"], sub["new"], doc.text)
@@ -51,7 +53,7 @@ if __name__ == "__main__":
         ]
     )
 
-    SpacySentencizer().segment(docs)
+    SpacySentencizer().segment(docs, parameters={})
 
     for doc in docs:
         print(doc.text)
