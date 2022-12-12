@@ -26,23 +26,9 @@ class SpacySentencizer(Executor):
     def segment(self, docs: DocumentArray, parameters: Dict[str, Any], **kwargs):
         print("Using segment function. This is fast")
         traversal_paths = parameters.get("traversal_paths", self.traversal_paths)
-        # First do some cleanup of unwanted linebreaks
-        substitutions = [
-            # Convert deliberate paragraph breaks into sentence-ends so they dont get caught by next entry in the list
-            {"old": "\n\n.*", "new": ". "},
-            {"old": "\r\r.*", "new": ". "},
-            # Remove incidental linebreaks caused by conversion
-            {"old": "\n", "new": " "},
-            {"old": "\r", "new": " "},
-            {"old": "\\s+", "new": " "},  # collapse white-spaces into one space
-        ]
 
         for doc in docs[traversal_paths]:
             if doc.text:
-                for sub in substitutions:
-                    doc.text = re.sub(sub["old"], sub["new"], doc.text)
-
-                # Sentencize
                 text = self.nlp(doc.text)
 
                 for sent in text.sents:
