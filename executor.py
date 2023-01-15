@@ -10,13 +10,26 @@ class SpacySentencizer(Executor):
     Splits text at doc-level into sentences using spaCy's sentencizer and stores as doc.chunks.
     """
 
-    def __init__(self, min_sent_len=20, traversal_paths: str = "@r", *args, **kwargs):
+    def __init__(self, min_sent_len=20, max_sent_len=77, max_len_overlap=0.5, traversal_paths: str = "@r", *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.min_sent_len = min_sent_len
         self.traversal_paths = traversal_paths
+        self.max_sent_len = max_sent_len
+        self.step_size = int(max_sent_len * (1 - max_len_overlap))
         self.nlp = English()
         self.nlp.add_pipe("sentencizer")
 
+    def _break_sentence(self, sent):
+        """
+        breaks a sentence into chunks of max_sent_len with overlap of max_len_overlap
+        """
+        chunks = []
+        for i in range(0, len(sent), self.step_size):
+            chunks.append(sent[i : i + self.max_sent_len])
+        return chunks
+        
+        
+    
     @requests(on="/index")
     def segment(self, docs: DocumentArray, parameters: Dict[str, Any], **kwargs):
         traversal_paths = parameters.get("traversal_paths", self.traversal_paths)
@@ -42,6 +55,12 @@ class SpacySentencizer(Executor):
                 for sent in text.sents:
                     if len(str(sent)) >= self.min_sent_len:
                         doc.chunks.append(Document(text=str(sent)))
+                    elif len(str(sent)) > self.max_sent_len:
+                        text_chunks = self._break_sentence(str(sent))
+                        for c in text_chunks:
+                            doc.chunks.append(Document(text=c))
+                    else:
+                        pass
 
 
 if __name__ == "__main__":
