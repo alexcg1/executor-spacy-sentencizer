@@ -53,9 +53,11 @@ class SpacySentencizer(Executor):
                 text = self.nlp(doc.text)
 
                 for sent in text.sents:
-                    if len(str(sent)) >= self.min_sent_len:
+                    # print('sent length: ', len(str(sent)))
+                    if (len(str(sent)) >= self.min_sent_len) and (len(str(sent)) <= self.max_sent_len):
                         doc.chunks.append(Document(text=str(sent)))
                     elif len(str(sent)) > self.max_sent_len:
+                        # print('Sentence too long, breaking into chunks')
                         text_chunks = self._break_sentence(str(sent))
                         for c in text_chunks:
                             doc.chunks.append(Document(text=c))
@@ -69,12 +71,15 @@ if __name__ == "__main__":
             Document(text="J.R.R. Tolkien turns to p.3 on www.google.com"),
             Document(text="Doe a deer, a female deer"),
             Document(text="The cat sits on a mat. The dog sits in a tree"),
+            Document(text="This is a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long sentence.")
         ]
     )
 
     SpacySentencizer().segment(docs, parameters={})
 
     for doc in docs:
-        print(doc.text)
+        # print(doc.text)
         for chunk in doc.chunks:
+            print('---'*10)
             print("\t", chunk.text)
+            print("---"*10)
